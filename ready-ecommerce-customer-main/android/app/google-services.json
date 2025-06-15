@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "1042757019826",
+    "project_id": "bajar247-15bdf",
+    "storage_bucket": "bajar247-15bdf.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1042757019826:android:159dd385c8a799cc4581ab",
+        "android_client_info": {
+          "package_name": "com.bajar247"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyApDZc-xMAbo3eX8XYBi5bVhn2GslhfQpQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
