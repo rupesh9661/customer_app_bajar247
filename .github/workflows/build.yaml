@@ -13,7 +13,7 @@ jobs:
         with:
           flutter-version: '3.24.0'
       - run: flutter pub get
-      - run: flutter build apk --release
+      - run: flutter build apk --debug
       - uses: actions/upload-artifact@v4
         with:
           name: release-apk
