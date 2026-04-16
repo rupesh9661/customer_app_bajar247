@@ -25,80 +25,104 @@ class SplashLayout extends ConsumerStatefulWidget {
 }
 
 class _SplashLayoutState extends ConsumerState<SplashLayout> {
+  bool _appInitialized = false;
+
   @override
   void initState() {
     super.initState();
 
+    // FIX #2: onStatusChange only fires when connectivity CHANGES.
+    // If the device is already connected when the app opens (normal case),
+    // the event never fires and no APIs are ever called.
+    // Solution: check the current status immediately, then also listen for changes.
+
+    // Check immediately on launch
+    ConnectivityWrapper.instance.isConnected.then((isConnected) {
+      if (isConnected) {
+        _initApp();
+      }
+    });
+
+    // Also handle the case where connectivity is gained after launch
     ConnectivityWrapper.instance.onStatusChange.listen((event) {
       if (event == ConnectivityStatus.CONNECTED) {
-        // Navigate to the login screen after a delay
-        ref
-            .read(masterControllerProvider.notifier)
-            .getMasterData()
-            .then((response) => {
-                  if (response?.data.themeColors.primaryColor != null)
-                    {
-                      ref.read(hiveServiceProvider).setPrimaryColor(
-                          color: response!.data.themeColors.primaryColor),
-                    },
-                  if (response?.data.appLogo != null)
-                    {
-                      ref
-                          .read(hiveServiceProvider)
-                          .setAppLogo(logo: response!.data.appLogo)
-                    },
-                  if (response?.data.appName != null)
-                    {
-                      ref
-                          .read(hiveServiceProvider)
-                          .setAppName(name: response!.data.appName),
-                    },
-                  if (response?.data.splashLogo != null)
-                    {
-                      ref
-                          .read(hiveServiceProvider)
-                          .setSplashLogo(splashLogo: response!.data.splashLogo),
-                    }
-                });
-        Future.wait([
-          ref.read(hiveServiceProvider).loadTokenAndUser(),
-        ]).then((data) {
-          Future.delayed(const Duration(seconds: 3), () {
-            if (data.first![0] == true &&
-                (data.first![1] == null || data.first![2] == null)) {
-              context.nav.pushNamedAndRemoveUntil(
-                Routes.getCoreRouteName(AppConstants.appServiceName),
-                (route) => false,
-              );
-            } else if ((data.first![1] != null) && (data.first![2] != null)) {
-              ref.read(apiClientProvider).updateToken(token: data.first![1]);
-              context.nav.pushNamedAndRemoveUntil(
-                Routes.getCoreRouteName(AppConstants.appServiceName),
-                (route) => false,
-              );
-            } else {
-              Navigator.pushReplacement(
-                context,
-                PageRouteBuilder(
-                  pageBuilder: ((context, animation, secondaryAnimation) =>
-                      const OnboardingView()),
-                  transitionDuration: const Duration(milliseconds: 600),
-                  barrierColor: Colors.black.withOpacity(0.5),
-                  transitionsBuilder:
-                      (context, animation, secondaryAnimation, child) {
-                    var offsetAnimation = animation.drive(
-                        Tween(begin: const Offset(0.0, 1.0), end: Offset.zero));
-                    return SlideTransition(
-                      position: offsetAnimation,
-                      child: child,
-                    );
-                  },
-                ),
-              );
-            }
-          });
-        });
+        _initApp();
       }
+    });
+  }
+
+  void _initApp() {
+    // Guard against calling this multiple times if connectivity fires repeatedly
+    if (_appInitialized) return;
+    _appInitialized = true;
+
+    ref
+        .read(masterControllerProvider.notifier)
+        .getMasterData()
+        .then((response) => {
+              if (response?.data.themeColors.primaryColor != null)
+                {
+                  ref.read(hiveServiceProvider).setPrimaryColor(
+                      color: response!.data.themeColors.primaryColor),
+                },
+              if (response?.data.appLogo != null)
+                {
+                  ref
+                      .read(hiveServiceProvider)
+                      .setAppLogo(logo: response!.data.appLogo)
+                },
+              if (response?.data.appName != null)
+                {
+                  ref
+                      .read(hiveServiceProvider)
+                      .setAppName(name: response!.data.appName),
+                },
+              if (response?.data.splashLogo != null)
+                {
+                  ref
+                      .read(hiveServiceProvider)
+                      .setSplashLogo(splashLogo: response!.data.splashLogo),
+                }
+            });
+
+    Future.wait([
+      ref.read(hiveServiceProvider).loadTokenAndUser(),
+    ]).then((data) {
+      Future.delayed(const Duration(seconds: 3), () {
+        if (!mounted) return;
+        if (data.first![0] == true &&
+            (data.first![1] == null || data.first![2] == null)) {
+          context.nav.pushNamedAndRemoveUntil(
+            Routes.getCoreRouteName(AppConstants.appServiceName),
+            (route) => false,
+          );
+        } else if ((data.first![1] != null) && (data.first![2] != null)) {
+          ref.read(apiClientProvider).updateToken(token: data.first![1]);
+          context.nav.pushNamedAndRemoveUntil(
+            Routes.getCoreRouteName(AppConstants.appServiceName),
+            (route) => false,
+          );
+        } else {
+          Navigator.pushReplacement(
+            context,
+            PageRouteBuilder(
+              pageBuilder: ((context, animation, secondaryAnimation) =>
+                  const OnboardingView()),
+              transitionDuration: const Duration(milliseconds: 600),
+              barrierColor: Colors.black.withOpacity(0.5),
+              transitionsBuilder:
+                  (context, animation, secondaryAnimation, child) {
+                var offsetAnimation = animation.drive(
+                    Tween(begin: const Offset(0.0, 1.0), end: Offset.zero));
+                return SlideTransition(
+                  position: offsetAnimation,
+                  child: child,
+                );
+              },
+            ),
+          );
+        }
+      });
     });
   }
 

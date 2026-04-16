@@ -34,6 +34,7 @@ void main() async {
   );
 
   await Hive.initFlutter();
+  await Hive.openBox(AppConstants.authBox);
   await Hive.openBox(AppConstants.appSettingsBox);
   await Hive.openBox(AppConstants.userBox);
   Hive.registerAdapter(HiveCartModelAdapter());

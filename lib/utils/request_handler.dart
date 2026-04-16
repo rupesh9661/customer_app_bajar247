@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:dio/dio.dart';
 import 'package:hive/hive.dart';
 import 'package:pretty_dio_logger/pretty_dio_logger.dart';
@@ -29,6 +31,22 @@ class ApiInterceptors {
 
   static void _addResponseHandlerInterceptor(Dio dio) {
     dio.interceptors.add(InterceptorsWrapper(
+      // FIX #3: Read token fresh from Hive on every request instead of
+      // relying on updateToken() being called on the right provider instance.
+      // This ensures authenticated requests always have the Bearer token,
+      // even after provider rebuilds or app restarts.
+      onRequest: (options, handler) {
+        try {
+          final authBox = Hive.box(AppConstants.authBox);
+          final token = authBox.get(AppConstants.authToken);
+          if (token != null) {
+            options.headers[HttpHeaders.authorizationHeader] = 'Bearer $token';
+          }
+        } catch (_) {
+          // authBox not open yet — token will be absent; server will return 401
+        }
+        handler.next(options);
+      },
       onResponse: (response, handler) {
         final message = response.data['message'];
         switch (response.statusCode) {
