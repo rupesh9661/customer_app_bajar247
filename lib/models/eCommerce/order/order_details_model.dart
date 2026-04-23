@@ -79,25 +79,31 @@ class Order {
   late final AddAddress address;
 
   Order.fromJson(Map<String, dynamic> json) {
-    id = json['id'];
-    orderCode = json['order_code'];
-    orderStatus = json['order_status'];
-    createdAt = json['created_at'];
-    taxAmount = json['tax_amount'];
-    paymentMethod = json['payment_method'];
-    paymentStatus = json['payment_status'];
-    totalAmount = json['total_amount'];
-    discount = json['discount'];
-    couponDiscount = json['coupon_discount'];
-    payableAmount = json['payable_amount'];
-    quantity = json['quantity'];
-    deliveryCharge = json['delivery_charge'];
+    id = (json['id'] as num).toInt();
+    orderCode = json['order_code'].toString();
+    orderStatus = json['order_status'].toString();
+    createdAt = json['created_at'].toString();
+    taxAmount = _toDouble(json['tax_amount']);
+    paymentMethod = json['payment_method'].toString();
+    paymentStatus = json['payment_status'].toString();
+    totalAmount = _toDouble(json['total_amount']);
+    discount = _toDouble(json['discount']);
+    couponDiscount = _toDouble(json['coupon_discount']);
+    payableAmount = _toDouble(json['payable_amount']);
+    quantity = (json['quantity'] as num).toInt();
+    deliveryCharge = _toDouble(json['delivery_charge']);
     shop = Shop.fromJson(json['shop']);
     products =
         List.from(json['products']).map((e) => Products.fromJson(e)).toList();
     invoiceUrl = json['invoice_url'];
     paymentReceiptUrl = json['payment_receipt_url'];
     address = AddAddress.fromMap(json['address']);
+  }
+
+  static double _toDouble(dynamic value) {
+    if (value == null) return 0.0;
+    if (value is num) return value.toDouble();
+    return double.tryParse(value.toString()) ?? 0.0;
   }
 
   Map<String, dynamic> toJson() {
@@ -146,15 +152,15 @@ class Shop {
   late final String totalReviews;
 
   Shop.fromJson(Map<String, dynamic> json) {
-    id = json['id'];
-    name = json['name'];
-    logo = json['logo'];
-    banner = json['banner'];
-    totalProducts = json['total_products'];
-    totalCategories = json['total_categories'];
-    rating = json['rating'];
-    shopStatus = json['shop_status'];
-    totalReviews = json['total_reviews'];
+    id = (json['id'] as num).toInt();
+    name = json['name'].toString();
+    logo = json['logo'].toString();
+    banner = json['banner'].toString();
+    totalProducts = (json['total_products'] as num).toInt();
+    totalCategories = (json['total_categories'] as num).toInt();
+    rating = Order._toDouble(json['rating']);
+    shopStatus = json['shop_status'].toString();
+    totalReviews = json['total_reviews'].toString();
   }
 
   Map<String, dynamic> toJson() {
@@ -197,16 +203,16 @@ class Products {
   late final double? rating;
 
   Products.fromJson(Map<String, dynamic> json) {
-    id = json['id'];
-    name = json['name'];
+    id = (json['id'] as num).toInt();
+    name = json['name'].toString();
     brand = json['brand'] as String?;
-    thumbnail = json['thumbnail'];
-    price = json['price'];
-    orderQty = json['order_qty'];
-    color = json['color'];
-    size = json['size'];
-    discountPrice = (json['discount_price'] as num).toDouble();
-    rating = json['rating'];
+    thumbnail = json['thumbnail'].toString();
+    price = Order._toDouble(json['price']);
+    orderQty = (json['order_qty'] as num).toInt();
+    color = json['color'] as String?;
+    size = json['size'] as String?;
+    discountPrice = Order._toDouble(json['discount_price']);
+    rating = json['rating'] != null ? Order._toDouble(json['rating']) : null;
   }
 
   Map<String, dynamic> toJson() {

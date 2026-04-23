@@ -472,7 +472,7 @@ class _EcommerceHomeViewLayoutState
 
   Widget _buildHeaderRow(BuildContext context) {
     return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      mainAxisAlignment: MainAxisAlignment.center,
       children: [
         _buildLeftRow(context),
         Icon(Icons.expand_more, color: colors(context).hintTextColor),
@@ -483,12 +483,13 @@ class _EcommerceHomeViewLayoutState
   Widget _buildLeftRow(BuildContext context) {
     return Expanded(
       child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
         children: [
           const AppLogo(withAppName: false, isAnimation: true),
           Gap(10.w),
           Expanded(
             child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 Text(S.of(context).deliverTo,
                     style: AppTextStyle(context)
