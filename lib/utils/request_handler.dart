@@ -13,6 +13,7 @@ class ApiInterceptors {
     dio.options.receiveTimeout = const Duration(seconds: 60);
     dio.options.headers['Accept'] = 'application/json';
     dio.options.headers['Content-Type'] = 'application/json';
+    dio.options.headers['User-Agent'] = 'Mozilla/5.0 (Linux; Android 10; Mobile) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Mobile Safari/537.36';
     _addLoggerInterceptor(dio);
     _addResponseHandlerInterceptor(dio);
   }
